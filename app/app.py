@@ -9,13 +9,10 @@ from sklearn.preprocessing import MinMaxScaler
 # -------------------------------
 # PAGE CONFIG
 # -------------------------------
-st.set_page_config(
-    page_title="Tesla Stock Dashboard",
-    layout="wide"
-)
+st.set_page_config(page_title="Tesla Dashboard", layout="wide")
 
 # -------------------------------
-# CSS (CLEAN BLUE UI)
+# CSS (BLUE UI)
 # -------------------------------
 st.markdown("""
 <style>
@@ -41,10 +38,10 @@ section[data-testid="stSidebar"] {
 # -------------------------------
 # TITLE
 # -------------------------------
-st.title("📊 Tesla Stock Prediction Dashboard")
+st.title("🚀 Tesla Stock Prediction Dashboard")
 
 # -------------------------------
-# PATH SETUP
+# PATHS
 # -------------------------------
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -58,17 +55,17 @@ model_path = os.path.join(BASE_DIR, 'outputs', 'models', 'lstm_model.h5')
 def load_data():
     df = pd.read_csv(data_path)
     df['Date'] = pd.to_datetime(df['Date'])
-    df = df.sort_values('Date')   # 🔥 FIXED
+    df = df.sort_values('Date')   # FIX latest price issue
     return df
 
 df = load_data()
 
 # -------------------------------
-# LOAD MODEL
+# LOAD MODEL (FIXED)
 # -------------------------------
 @st.cache_resource
 def load_my_model():
-    return load_model(model_path)
+    return load_model(model_path, compile=False)   # 🔥 FIX
 
 model = load_my_model()
 
@@ -77,11 +74,18 @@ model = load_my_model()
 # -------------------------------
 st.sidebar.header("⚙️ Controls")
 
-days = st.sidebar.slider("Prediction Days", 1, 10, 5)
+days = st.sidebar.selectbox(
+    "Prediction Days",
+    [1, 5, 10]
+)
 
 st.sidebar.markdown("---")
-st.sidebar.write("📌 Model: LSTM")
-st.sidebar.write("📌 Window: 60 Days")
+st.sidebar.markdown("### 📌 Model Info")
+st.sidebar.write("Model: LSTM")
+st.sidebar.write("Window Size: 60 days")
+st.sidebar.write("Units: 50")
+st.sidebar.write("Dropout: 0.2")
+st.sidebar.write("Optimizer: Adam")
 
 # -------------------------------
 # PREPROCESSING
@@ -109,7 +113,7 @@ for i in range(days):
 predictions = scaler.inverse_transform(np.array(predictions).reshape(-1,1))
 
 # -------------------------------
-# KEY METRICS
+# METRICS
 # -------------------------------
 latest_price = df['Close'].iloc[-1]
 
@@ -126,7 +130,7 @@ with col1:
 with col2:
     st.markdown(f"""
     <div class="card">
-        <h3>Next Day Prediction</h3>
+        <h3>Next Day</h3>
         <h2>${predictions[0][0]:.2f}</h2>
     </div>
     """, unsafe_allow_html=True)
@@ -140,15 +144,28 @@ with col3:
     """, unsafe_allow_html=True)
 
 # -------------------------------
-# GRAPH SECTION
+# STOCK TREND
 # -------------------------------
 st.markdown("## 📉 Stock Price Trend")
-
 df_chart = df.set_index('Date')
 st.line_chart(df_chart['Close'])
 
 # -------------------------------
-# PREDICTION TABLE
+# ACTUAL VS PREDICTED
+# -------------------------------
+st.markdown("## 📊 Actual vs Predicted")
+
+actual = df['Close'].values[-len(predictions):]
+
+compare_df = pd.DataFrame({
+    "Actual": actual,
+    "Predicted": predictions.flatten()
+})
+
+st.line_chart(compare_df)
+
+# -------------------------------
+# PREDICTIONS TABLE
 # -------------------------------
 st.markdown("## 📌 Future Predictions")
 
@@ -166,7 +183,18 @@ st.markdown("## 📂 Dataset Preview")
 st.dataframe(df.tail(), use_container_width=True)
 
 # -------------------------------
+# INSIGHTS
+# -------------------------------
+st.markdown("## 💼 Insights")
+
+st.write("""
+- LSTM performs better than RNN due to long-term dependency handling  
+- Useful for stock forecasting and investment decisions  
+- Model captures trends but cannot predict sudden market fluctuations  
+""")
+
+# -------------------------------
 # FOOTER
 # -------------------------------
 st.markdown("---")
-st.markdown("🚀 Built with LSTM | Streamlit Dashboard")
+st.markdown("🚀 Built using Deep Learning (LSTM) | Streamlit Dashboard")
