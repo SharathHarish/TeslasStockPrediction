@@ -46,7 +46,7 @@ st.title("🚀 Tesla Stock Prediction Dashboard")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 data_path = os.path.join(BASE_DIR, 'data', 'TSLA.csv')
-model_path = os.path.join(BASE_DIR, 'outputs', 'models', 'lstm_model.keras')  # ✅ NEW FORMAT
+model_path = os.path.join(BASE_DIR, 'outputs', 'models', 'lstm_model.h5')  # ✅ NEW FORMAT
 
 # -------------------------------
 # LOAD DATA
