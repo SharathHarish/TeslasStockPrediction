@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 
-from keras.models import load_model
+from tensorflow.keras.models import load_model   # ✅ FIXED IMPORT
 from sklearn.preprocessing import MinMaxScaler
 
 # -------------------------------
@@ -12,7 +12,7 @@ from sklearn.preprocessing import MinMaxScaler
 st.set_page_config(page_title="Tesla Dashboard", layout="wide")
 
 # -------------------------------
-# CSS (BLUE UI)
+# CSS (PRO BLUE UI)
 # -------------------------------
 st.markdown("""
 <style>
@@ -41,12 +41,12 @@ section[data-testid="stSidebar"] {
 st.title("🚀 Tesla Stock Prediction Dashboard")
 
 # -------------------------------
-# PATHS
+# PATH SETUP
 # -------------------------------
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 data_path = os.path.join(BASE_DIR, 'data', 'TSLA.csv')
-model_path = os.path.join(BASE_DIR, 'outputs', 'models', 'lstm_model.h5')
+model_path = os.path.join(BASE_DIR, 'outputs', 'models', 'lstm_model.keras')  # ✅ NEW FORMAT
 
 # -------------------------------
 # LOAD DATA
@@ -55,17 +55,17 @@ model_path = os.path.join(BASE_DIR, 'outputs', 'models', 'lstm_model.h5')
 def load_data():
     df = pd.read_csv(data_path)
     df['Date'] = pd.to_datetime(df['Date'])
-    df = df.sort_values('Date')   # FIX latest price issue
+    df = df.sort_values('Date')   # ✅ FIX latest price issue
     return df
 
 df = load_data()
 
 # -------------------------------
-# LOAD MODEL (FIXED)
+# LOAD MODEL
 # -------------------------------
 @st.cache_resource
 def load_my_model():
-    return load_model(model_path, compile=False)   # 🔥 FIX
+    return load_model(model_path, compile=False)   # ✅ FIXED
 
 model = load_my_model()
 
@@ -75,7 +75,7 @@ model = load_my_model()
 st.sidebar.header("⚙️ Controls")
 
 days = st.sidebar.selectbox(
-    "Prediction Days",
+    "📅 Select Prediction Horizon",
     [1, 5, 10]
 )
 
@@ -90,32 +90,33 @@ st.sidebar.write("Optimizer: Adam")
 # -------------------------------
 # PREPROCESSING
 # -------------------------------
-data = df[['Close']]
+data = df[['Adj Close']]   # ✅ DOCUMENT REQUIREMENT
 scaler = MinMaxScaler()
 scaled_data = scaler.fit_transform(data)
 
 # -------------------------------
-# PREDICTION
+# PREDICTION FUNCTION
 # -------------------------------
-last_data = scaled_data[-60:]
-temp_input = last_data.tolist()
+def predict_future(days):
+    temp_input = list(scaled_data[-60:])
+    predictions = []
 
-predictions = []
+    for i in range(days):
+        x_input = np.array(temp_input[-60:])
+        x_input = x_input.reshape(1, 60, 1)
 
-for i in range(days):
-    x_input = np.array(temp_input[-60:])
-    x_input = x_input.reshape(1, 60, 1)
+        pred = model.predict(x_input, verbose=0)
+        temp_input.append(pred[0])
+        predictions.append(pred[0][0])
 
-    pred = model.predict(x_input, verbose=0)
-    temp_input.append(pred[0].tolist())
-    predictions.append(pred[0][0])
+    return scaler.inverse_transform(np.array(predictions).reshape(-1,1))
 
-predictions = scaler.inverse_transform(np.array(predictions).reshape(-1,1))
+predictions = predict_future(days)
 
 # -------------------------------
 # METRICS
 # -------------------------------
-latest_price = df['Close'].iloc[-1]
+latest_price = df['Adj Close'].iloc[-1]
 
 col1, col2, col3 = st.columns(3)
 
@@ -147,15 +148,16 @@ with col3:
 # STOCK TREND
 # -------------------------------
 st.markdown("## 📉 Stock Price Trend")
+
 df_chart = df.set_index('Date')
-st.line_chart(df_chart['Close'])
+st.line_chart(df_chart['Adj Close'])
 
 # -------------------------------
 # ACTUAL VS PREDICTED
 # -------------------------------
 st.markdown("## 📊 Actual vs Predicted")
 
-actual = df['Close'].values[-len(predictions):]
+actual = df['Adj Close'].values[-len(predictions):]
 
 compare_df = pd.DataFrame({
     "Actual": actual,
@@ -188,9 +190,9 @@ st.dataframe(df.tail(), use_container_width=True)
 st.markdown("## 💼 Insights")
 
 st.write("""
-- LSTM performs better than RNN due to long-term dependency handling  
-- Useful for stock forecasting and investment decisions  
-- Model captures trends but cannot predict sudden market fluctuations  
+- LSTM outperforms RNN due to its ability to capture long-term dependencies  
+- Stock prediction helps in forecasting trends for investment decisions  
+- Model captures patterns but cannot predict sudden market fluctuations  
 """)
 
 # -------------------------------
