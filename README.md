@@ -179,10 +179,47 @@ In this project, we successfully built a deep learning model to predict Tesla st
 * Streamlit
 
 ---
+## **⚙️ 🚀 INSTALLATION & RUNNING INSTRUCTIONS**
+🖥️ 1️⃣ CREATE PROJECT FOLDER
+clone TeslaStockPrediction
+cd TeslaStockPrediction
+🧪 2️⃣ CREATE VIRTUAL ENVIRONMENT
+✅ Windows:
+python -m venv venv
+▶️ 3️⃣ ACTIVATE VENV
+✅ Windows (PowerShell):
+venv\Scripts\activate
+
+👉 You should see:
+
+(venv)
+📦 4️⃣ INSTALL REQUIREMENTS
+pip install -r requirements.txt
+📄 5️⃣ REQUIREMENTS.TXT 
+streamlit==1.35.0
+pandas==2.2.2
+numpy==1.26.4
+matplotlib==3.8.4
+scikit-learn==1.4.2
+tensorflow==2.15.0
+h5py==3.10.0
+
+
+📓 7️⃣ RUN NOTEBOOK
+jupyter notebook
+
+👉 Then:
+
+Open model.ipynb
+Run all cells
+Ensure model is saved
+▶️ 8️⃣ RUN STREAMLIT APP
+streamlit run app/app.py
 
 ## **17. Deployment**
 
 The project was successfully deployed using Streamlit, allowing users to interact with the model and visualize predictions in real-time.
+https://teslasstockprediction-jpkgzq78xzqx7cchzjnqoe.streamlit.app/
 
 ---
 
