@@ -179,7 +179,7 @@ In this project, we successfully built a deep learning model to predict Tesla st
 * Streamlit
 
 ---
-## **⚙️ 🚀 INSTALLATION & RUNNING INSTRUCTIONS**
+## **17.⚙️ 🚀 INSTALLATION & RUNNING INSTRUCTIONS**
 🖥️ 1️⃣ CREATE PROJECT FOLDER
 clone TeslaStockPrediction
 cd TeslaStockPrediction
@@ -216,14 +216,14 @@ Ensure model is saved
 ▶️ 8️⃣ RUN STREAMLIT APP
 streamlit run app/app.py
 
-## **17. Deployment**
+## **18. Deployment**
 
 The project was successfully deployed using Streamlit, allowing users to interact with the model and visualize predictions in real-time.
 https://teslasstockprediction-jpkgzq78xzqx7cchzjnqoe.streamlit.app/
 
 ---
 
-## **18. Technical Tags**
+## **19. Technical Tags**
 
 #finance #stockprediction #deeplearning #lstm
 
